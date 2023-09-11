@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
+import { addDoc, updateDoc, doc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface Priority {
   id: string;
@@ -19,7 +19,7 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 const Home: React.FC = () => {
-  const [user, setUser] = useState<firebase.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [priorities, setPriorities] = useState<Priority[]>([]);
   const [newPriority, setNewPriority] = useState<string>('');
 
@@ -31,9 +31,11 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    db.collection('priorities').orderBy('votes', 'desc').onSnapshot((snapshot) => {
+    const q = query(collection(db, 'priorities'), orderBy('votes', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       setPriorities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Priority)));
     });
+    return () => unsubscribe();
   }, []);
 
   const signInWithGoogle = () => {
@@ -42,20 +44,20 @@ const Home: React.FC = () => {
     signInWithPopup(auth, provider);
   };
 
-  const addPriority = () => {
-    db.collection('priorities').add({
+  const addPriority = async () => {
+    await addDoc(collection(db, 'priorities'), {
       name: newPriority,
       votes: 1
     });
     setNewPriority('');
   };
 
-  const vote = (id: string, votes: number) => {
-    db.collection('priorities').doc(id).update({
+  const vote = async (id: string, votes: number) => {
+    const priorityRef = doc(db, 'priorities', id);
+    await updateDoc(priorityRef, {
       votes: votes + 1
     });
   };
-
   return (
     <div>
       {user ? (
