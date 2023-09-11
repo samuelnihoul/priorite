@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
