@@ -1,27 +1,25 @@
 'use client'
 import { useState, useEffect } from 'react';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey: 'YOUR_API_KEY',
-    authDomain: 'YOUR_AUTH_DOMAIN',
-    projectId: 'YOUR_PROJECT_ID'
-  });
-}
+const app = initializeApp({
+  apiKey: 'AIzaSyApX_yIFUXlbiAqFkIk2jP5IghqjNSPyk4',
+  authDomain: 'priorite-7dfa1.firebaseapp.com',
+  projectId: 'priorite-7dfa1'
+});
 
-const db = firebase.firestore();
 
+const db = getFirestore(app);
 export default function Home() {
   const [user, setUser] = useState(null);
   const [priorities, setPriorities] = useState([]);
   const [newPriority, setNewPriority] = useState('');
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged((user) => {
+    onAuthStateChanged((user) => {
       setUser(user);
     });
   }, []);
@@ -33,8 +31,9 @@ export default function Home() {
   }, []);
 
   const signInWithGoogle = () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider);
+    const provider = new GoogleAuthProvider()
+    const auth = getAuth()
+    signInWithPopup(auth, provider)
   };
 
   const addPriority = () => {
