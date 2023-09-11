@@ -1,8 +1,13 @@
-'use client'
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+
+interface Priority {
+  id: string;
+  name: string;
+  votes: number;
+}
 
 // Initialize Firebase
 const app = initializeApp({
@@ -11,29 +16,30 @@ const app = initializeApp({
   projectId: 'priorite-7dfa1'
 });
 
-
 const db = getFirestore(app);
-export default function Home() {
-  const [user, setUser] = useState(null);
-  const [priorities, setPriorities] = useState([]);
-  const [newPriority, setNewPriority] = useState('');
+
+const Home: React.FC = () => {
+  const [user, setUser] = useState<firebase.User | null>(null);
+  const [priorities, setPriorities] = useState<Priority[]>([]);
+  const [newPriority, setNewPriority] = useState<string>('');
 
   useEffect(() => {
-    onAuthStateChanged((user) => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
   }, []);
 
   useEffect(() => {
     db.collection('priorities').orderBy('votes', 'desc').onSnapshot((snapshot) => {
-      setPriorities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      setPriorities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Priority)));
     });
   }, []);
 
   const signInWithGoogle = () => {
-    const provider = new GoogleAuthProvider()
-    const auth = getAuth()
-    signInWithPopup(auth, provider)
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth();
+    signInWithPopup(auth, provider);
   };
 
   const addPriority = () => {
@@ -44,7 +50,7 @@ export default function Home() {
     setNewPriority('');
   };
 
-  const vote = (id, votes) => {
+  const vote = (id: string, votes: number) => {
     db.collection('priorities').doc(id).update({
       votes: votes + 1
     });
@@ -72,3 +78,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;
