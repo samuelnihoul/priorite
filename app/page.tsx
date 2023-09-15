@@ -70,7 +70,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className='font-sans'>
       {user ? (
         <div>
           <h1>Welcome, {user.displayName}</h1>
