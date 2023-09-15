@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
-import { addDoc, updateDoc, doc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
+import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface Priority {
   id: string;
@@ -55,10 +55,20 @@ const Home: React.FC = () => {
 
   const vote = async (id: string, votes: number) => {
     const priorityRef = doc(db, 'priorities', id);
-    await updateDoc(priorityRef, {
-      votes: votes + 1
-    });
+    const priority = await getDoc(priorityRef);
+    const voters = priority.data()?.voters || [];
+
+    if (!voters.includes(user?.uid)) {
+      await updateDoc(priorityRef, {
+        votes: votes + 1,
+        voters: [...voters, user?.uid]
+      });
+    } else {
+      // User has already voted
+      alert("You've already voted for this priority.");
+    }
   };
+
   return (
     <div>
       {user ? (
@@ -75,8 +85,10 @@ const Home: React.FC = () => {
             ))}
           </ul>
         </div>
-      ) : (
+      ) : (<>
+        <h1>Welcome</h1>
         <button onClick={signInWithGoogle}>Sign in with Google</button>
+      </>
       )}
     </div>
   );
