@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
+import { signOut, GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
 import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
 interface Priority {
@@ -44,6 +44,11 @@ const Home: React.FC = () => {
     const auth = getAuth();
     signInWithPopup(auth, provider);
   };
+  const logout = async () => {
+    const auth = getAuth();
+    await signOut(auth)
+    setUser(null)
+  }
 
   const addPriority = async () => {
     await addDoc(collection(db, 'priorities'), {
@@ -70,28 +75,30 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className='font-sans'>
-      {user ? (
+    <div className='container mx-auto w-full'>
+      <div className='flex justify-between items-center'>
+        <h1>Welcome {user ? ', ' + user.displayName : ''}</h1>
+        {user ? (
+          <button onClick={logout} className='text-right'>Logout</button>
+        ) : (
+          <button onClick={signInWithGoogle} className='text-right'>Sign in with Google</button>
+        )}
+      </div>
+      {user && (
         <div>
-          <h1>Welcome, {user.displayName}</h1>
-          <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} />
-          <button onClick={addPriority}>Add Priority</button>
+          <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
+          <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded'>Add Priority</button>
           <ul>
             {priorities.map(priority => (
-              <li key={priority.id}>
+              <li key={priority.id} className='my-2'>
                 {priority.name} ({priority.votes} votes)
-                <button onClick={() => vote(priority.id, priority.votes)}>Vote</button>
+                <button onClick={() => vote(priority.id, priority.votes)} className='ml-2 bg-green-500 text-white rounded'>Vote</button>
               </li>
             ))}
           </ul>
         </div>
-      ) : (<>
-        <h1>Welcome</h1>
-        <button onClick={signInWithGoogle}>Sign in with Google</button>
-      </>
       )}
     </div>
   );
 }
-
-export default Home;
+export default Home; 
