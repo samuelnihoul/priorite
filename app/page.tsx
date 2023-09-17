@@ -87,12 +87,12 @@ const Home: React.FC = () => {
       {user && (
         <div>
           <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
-          <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded'>Add Priority</button>
+          <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
           <ul>
             {priorities.map(priority => (
               <li key={priority.id} className='my-2'>
                 {priority.name} ({priority.votes} votes)
-                <button onClick={() => vote(priority.id, priority.votes)} className='ml-2 bg-green-500 text-white rounded'>Vote Up</button>
+                <button onClick={() => vote(priority.id, priority.votes)} className='px-1 ml-2 bg-green-500 text-white rounded'>Vote Up</button>
               </li>
             ))}
           </ul>
