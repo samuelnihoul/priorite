@@ -75,13 +75,13 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className='container mx-auto w-full'>
+    <div className='container mx-auto w-full h-[80%]'>
       <div className='flex justify-between items-center'>
         <h1>Welcome {user ? ', ' + user.displayName : ''}</h1>
         {user ? (
           <button onClick={logout} className='text-right'>Logout</button>
         ) : (
-          <button onClick={signInWithGoogle} className='text-right'>Sign in with Google</button>
+          <button onClick={signInWithGoogle} className='text-right h-[3rem]'>Sign in with Google</button>
         )}
       </div>
       {user && (
