@@ -51,6 +51,10 @@ const Home: React.FC = () => {
   }
 
   const addPriority = async () => {
+    if (!user){
+      alert("Please log in to interact with this list")
+      return
+    }
     await addDoc(collection(db, 'priorities'), {
       name: newPriority,
       votes: 1
@@ -59,6 +63,10 @@ const Home: React.FC = () => {
   };
 
   const vote = async (id: string, votes: number) => {
+    if (!user){
+      alert("Please log in to vote")
+      return
+    }
     const priorityRef = doc(db, 'priorities', id);
     const priority = await getDoc(priorityRef);
     const voters = priority.data()?.voters || [];
@@ -84,7 +92,7 @@ const Home: React.FC = () => {
           <button onClick={signInWithGoogle} className='text-right h-[3rem]'>Sign in with Google</button>
         )}
       </div>
-      {user && (
+      
         <div>
           <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
           <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
@@ -97,7 +105,7 @@ const Home: React.FC = () => {
             ))}
           </ul>
         </div>
-      )}
+      
     </div>
   );
 }
