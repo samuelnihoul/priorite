@@ -92,7 +92,8 @@ const Home: React.FC = () => {
           <button onClick={signInWithGoogle} className='text-right h-[3rem]'>Sign in with Google</button>
         )}
       </div>
-      
+      <h1>Priorite</h1>
+      <h2>Crowdsourced Developmental Priorities List</h2>
         <div>
           <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
           <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
