@@ -62,7 +62,7 @@ const Home: React.FC = () => {
     setNewPriority('');
   };
 
-  const vote = async (id: string, votes: number) => {
+  const vote = async (id: string, votes: number,isUp:boolean) => {
     if (!user){
       alert("Please log in to vote")
       return
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
 
     if (!voters.includes(user?.uid)) {
       await updateDoc(priorityRef, {
-        votes: votes + 1,
+        votes: votes + isUp?1:-1,
         voters: [...voters, user?.uid]
       });
     } else {
@@ -101,7 +101,8 @@ const Home: React.FC = () => {
             {priorities.map(priority => (
               <li key={priority.id} className='my-2'>
                 {priority.name} +{priority.votes}
-                <button onClick={() => vote(priority.id, priority.votes)} className='px-1 ml-2 bg-green-500 text-white rounded'>Vote Up</button>
+                <button onClick={() => vote(priority.id, priority.votes,true)} className='px-1 ml-2 bg-green-500 text-white rounded'>⬆️</button>
+                <button onClick={() => vote(priority.id, priority.votes,false)} className='px-1 ml-2 bg-red-500 text-white rounded'>⬇️</button>
               </li>
             ))}
           </ul>
