@@ -70,10 +70,10 @@ const Home: React.FC = () => {
     const priorityRef = doc(db, 'priorities', id);
     const priority = await getDoc(priorityRef);
     const voters = priority.data()?.voters || [];
-
+    
     if (!voters.includes(user?.uid)) {
       await updateDoc(priorityRef, {
-        votes: votes + isUp?1:-1,
+        votes: votes + (isUp?1:-1),
         voters: [...voters, user?.uid]
       });
     } else {
