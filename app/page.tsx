@@ -85,7 +85,7 @@ const Home: React.FC = () => {
   return (
     <div className='container mx-auto w-full h-[80%]'>
       <div className='flex justify-between items-center'>
-        <h1>Welcome {user ? ', ' + user.displayName : ''}</h1>
+        <h1>Welcome {user ? ', ' + user.displayName : '🥸'}</h1>
         {user ? (
           <button onClick={logout} className='text-right'>Logout</button>
         ) : (
