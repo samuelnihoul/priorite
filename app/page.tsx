@@ -85,15 +85,15 @@ const Home: React.FC = () => {
   return (
     <div className='container mx-auto w-full h-[80%]'>
       <div className='flex justify-between items-center'>
-        <h1>Welcome {user ? ', ' + user.displayName : '🥸'}</h1>
+        <span>Welcome {user ? ', ' + user.displayName : '🥸'}</span>
         {user ? (
           <button onClick={logout} className='text-right'>Logout</button>
         ) : (
           <button onClick={signInWithGoogle} className='text-right h-[3rem]'>Sign in with Google</button>
         )}
       </div>
-      <h1>Priorite</h1>
-      <h2>Crowdsourced Developmental Priorities List</h2>
+      <h1 className="text-4xl font-bold">Priorite</h1>
+      <h2 className="text-3xl font-semibold">Crowdsourced Developmental Priorities List</h2>
         <div>
           <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
           <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
