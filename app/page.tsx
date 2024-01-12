@@ -100,7 +100,7 @@ const Home: React.FC = () => {
           <ul>
             {priorities.map(priority => (
               <li key={priority.id} className='my-2'>
-                <span className="rounded-full bg-white text-black m-1 p-1">{priority.votes}</span>
+                <span className="rounded-full bg-white text-black mx-1 px-1">{priority.votes}</span>
                 {priority.name} 
                 <button onClick={() => vote(priority.id, priority.votes,true)} className='px-1 ml-2 bg-green-500 text-white rounded'>👍</button>
                 <button onClick={() => vote(priority.id, priority.votes,false)} className='px-1 ml-2 bg-red-500 text-white rounded'>👎</button>
