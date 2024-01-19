@@ -51,7 +51,7 @@ const Home: React.FC = () => {
   }
 
   const addPriority = async () => {
-    if (!user){
+    if (!user) {
       alert("Please log in to interact with this list")
       return
     }
@@ -62,18 +62,18 @@ const Home: React.FC = () => {
     setNewPriority('');
   };
 
-  const vote = async (id: string, votes: number,isUp:boolean) => {
-    if (!user){
+  const vote = async (id: string, votes: number, isUp: boolean) => {
+    if (!user) {
       alert("Please log in to vote")
       return
     }
     const priorityRef = doc(db, 'priorities', id);
     const priority = await getDoc(priorityRef);
     const voters = priority.data()?.voters || [];
-    
+
     if (!voters.includes(user?.uid)) {
       await updateDoc(priorityRef, {
-        votes: votes + (isUp?1:-1),
+        votes: votes + (isUp ? 1 : -1),
         voters: [...voters, user?.uid]
       });
     } else {
@@ -84,7 +84,7 @@ const Home: React.FC = () => {
 
   return (
     <div className='container mx-auto w-full h-full px-10'>
-      <div className='flex justify-between items-center'>
+      <div className='flex justify-between items-center h-[10%]'>
         <span>Welcome {user ? ', ' + user.displayName : '🥸'}</span>
         {user ? (
           <button onClick={logout} className='text-right'>Logout</button>
@@ -94,21 +94,21 @@ const Home: React.FC = () => {
       </div>
       <h1 className="text-4xl font-bold text-center">Priorite</h1>
       <h2 className="text-3xl font-semibold text-center">Crowdsourced Developmental Priorities List</h2>
-        <div>
-          <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
-          <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
-          <ul>
-            {priorities.map(priority => (
-              <li key={priority.id} className='my-2'>
-                <span className="rounded-full bg-white text-black mx-1 px-1">{priority.votes}</span>
-                {priority.name} 
-                <button onClick={() => vote(priority.id, priority.votes,true)} className='px-1 ml-2 bg-green-500 text-white rounded'>👍</button>
-                <button onClick={() => vote(priority.id, priority.votes,false)} className='px-1 ml-2 bg-red-500 text-white rounded'>👎</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      
+      <div>
+        <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
+        <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
+        <ul>
+          {priorities.map(priority => (
+            <li key={priority.id} className='my-2'>
+              <span className="rounded-full bg-white text-black mx-1 px-1">{priority.votes}</span>
+              {priority.name}
+              <button onClick={() => vote(priority.id, priority.votes, true)} className='px-1 ml-2 bg-green-500 text-white rounded'>👍</button>
+              <button onClick={() => vote(priority.id, priority.votes, false)} className='px-1 ml-2 bg-red-500 text-white rounded'>👎</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
     </div>
   );
 }
