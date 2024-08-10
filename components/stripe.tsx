@@ -1,25 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { app, PrioriteUser } from '@/utils/firebase';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
-const environment = process.env.environment
-const pub_key = environment === 'production' ? process.env.NETX_APP_stripe_pk : process.env.NEXT_APP_stripe_pk_test
-const stripePromise = loadStripe('your-publishable-key');
+const environment = process.env.environment;
+const pub_key = environment === 'production' ? process.env.NETX_APP_stripe_pk : process.env.NEXT_APP_stripe_pk_test;
+const stripePromise = loadStripe(pub_key);
 
-const PurchaseCredits = ({ user, setCredits, credits }) => {
+const PurchaseCredits = ({ username }: { username: string }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [clientSecret, setClientSecret] = useState('');
+    const [user, setUser] = useState(null);
+    const [credits, setCredits] = useState(0);
 
     useEffect(() => {
-        // Fetch the client secret from the backend
-        fetch('/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then(res => res.json())
-            .then(data => setClientSecret(data.clientSecret));
-    }, []);
+        const fetchUserAndClientSecret = async () => {
+            const db = getFirestore(app);
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('name', '==', username));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                setUser(userData);
+                setCredits(userData.credits);
+
+                // Fetch the client secret from the backend
+                const response = await fetch('/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                setClientSecret(data.clientSecret);
+            } else {
+                console.error('User not found');
+            }
+        };
+
+        fetchUserAndClientSecret();
+    }, [username]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -52,26 +73,17 @@ const PurchaseCredits = ({ user, setCredits, credits }) => {
     return (
         <form onSubmit={handleSubmit}>
             <CardElement />
-            <button type="submit" disabled={!stripe || !clientSecret}>Pay</button>
+            <button className="bg-red" type="submit" disabled={!stripe || !clientSecret}>Buy More Credits</button>
         </form>
     );
 };
 
-// const App = ({ user }) => {
-//     const [credits, setCredits] = useState(0);
+const App = ({ username }) => {
+    return (
+        <Elements stripe={stripePromise}>
+            <PurchaseCredits username={username} />
+        </Elements>
+    );
+};
 
-//     useEffect(() => {
-//         // Fetch user credits from the backend
-//         fetch(`/api/get-credits?userId=${user.id}`)
-//             .then(res => res.json())
-//             .then(data => setCredits(data.credits));
-//     }, [user]);
-
-//     return (
-//         <Elements stripe={stripePromise}>
-//             <PurchaseCredits user={user} setCredits={setCredits} credits={credits} />
-//         </Elements>
-//     );
-// };
-
-// export default App;
+export default App;

@@ -1,11 +1,9 @@
 'use client'
 import PurchaseCredit from '@/components/stripe'
 import { useState, useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
 import { signOut, GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
-import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
-
-
+import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot, setDoc } from 'firebase/firestore';
+import { app, Priority, PrioriteUser } from '@/utils/firebase'
 
 const db = getFirestore(app);
 
@@ -13,6 +11,7 @@ const Home: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [priorities, setPriorities] = useState<Priority[]>([]);
   const [newPriority, setNewPriority] = useState<string>('');
+  const [userData, setUserData] = useState<PrioriteUser | null>(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -20,6 +19,20 @@ const Home: React.FC = () => {
       setUser(user);
     });
   }, []);
+  useEffect(() => {
+    if (user) {
+      const fetchUserData = async () => {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setUserData(userDoc.data() as PrioriteUser);
+        } else {
+          console.error('User data not found');
+        }
+      };
+      fetchUserData();
+    }
+  }, [user]);
 
   useEffect(() => {
     const q = query(collection(db, 'priorities'), orderBy('votes', 'desc'));
@@ -29,10 +42,19 @@ const Home: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
-    signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const userDocRef = doc(db, 'users', user.uid);
+    await setDoc(userDocRef, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      credits: 0,
+    });
   };
   const logout = async () => {
     const auth = getAuth();
@@ -84,6 +106,7 @@ const Home: React.FC = () => {
       </div>
       <h1 className="text-4xl font-bold text-center">Priorite</h1>
       <h2 className="text-3xl font-semibold text-center">Crowdsourced Developmental Priorities List</h2>
+      <p>You have {userData?.credits} credits.</p>
       <div>
         <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
         <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
@@ -97,7 +120,7 @@ const Home: React.FC = () => {
             </li>
           ))}
         </ul>
-        <PurchaseCredit></PurchaseCredit>
+        <PurchaseCredit username={user?.email}></PurchaseCredit>
       </div>
 
     </div>

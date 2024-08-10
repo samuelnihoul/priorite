@@ -6,7 +6,7 @@ export const app = initializeApp({
     projectId: 'priorite-7dfa1'
 });
 
-export interface User {
+export interface PrioriteUser {
     name: string;
     credits: number;
     id: string
