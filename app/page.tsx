@@ -5,18 +5,7 @@ import { initializeApp } from 'firebase/app';
 import { signOut, GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
 import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot } from 'firebase/firestore';
 
-interface Priority {
-  id: string;
-  name: string;
-  votes: number;
-}
 
-// Initialize Firebase
-const app = initializeApp({
-  apiKey: 'AIzaSyApX_yIFUXlbiAqFkIk2jP5IghqjNSPyk4',
-  authDomain: 'priorite-7dfa1.firebaseapp.com',
-  projectId: 'priorite-7dfa1'
-});
 
 const db = getFirestore(app);
 
