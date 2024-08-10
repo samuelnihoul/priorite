@@ -1,4 +1,5 @@
 'use client'
+import PurchaseCredit from '@/components/stripe'
 import { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { signOut, GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
@@ -107,6 +108,7 @@ const Home: React.FC = () => {
             </li>
           ))}
         </ul>
+        <PurchaseCredit></PurchaseCredit>
       </div>
 
     </div>
