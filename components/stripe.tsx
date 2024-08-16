@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
@@ -12,7 +13,7 @@ const PurchaseCredits = ({ username }: { username: string }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [clientSecret, setClientSecret] = useState('');
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<PrioriteUser | null>(null);
     const [credits, setCredits] = useState(0);
 
     useEffect(() => {
@@ -21,7 +22,7 @@ const PurchaseCredits = ({ username }: { username: string }) => {
             const usersRef = collection(db, 'users');
             const q = query(usersRef, where('name', '==', username));
             const querySnapshot = await getDocs(q);
-
+            //create if empty
             if (!querySnapshot.empty) {
                 const userData = querySnapshot.docs[0].data();
                 setUser(userData);
@@ -62,7 +63,7 @@ const PurchaseCredits = ({ username }: { username: string }) => {
             fetch('/api/update-credits', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id, credits: 5 }),
+                body: JSON.stringify({ userId: user?.id, credits: 5 }),
             }).then(() => {
                 // Update credits in the frontend
                 setCredits(credits + 5);
@@ -73,12 +74,14 @@ const PurchaseCredits = ({ username }: { username: string }) => {
     return (
         <form onSubmit={handleSubmit}>
             <CardElement />
-            <button className="bg-red" type="submit" disabled={!stripe || !clientSecret}>Buy More Credits</button>
+            <button className="bg-red border-red-50 border-double p-50" type="submit" disabled={!stripe || !clientSecret}>Buy More Credits</button>
+            <br />
+            <button className='p-500'>test</button>
         </form>
     );
 };
 
-const App = ({ username }) => {
+const App = ({ username }: { username: string }) => {
     return (
         <Elements stripe={stripePromise}>
             <PurchaseCredits username={username} />

@@ -1,6 +1,6 @@
 'use client'
 import PurchaseCredit from '@/components/stripe'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signOut, GoogleAuthProvider, onAuthStateChanged, getAuth, signInWithPopup, User } from 'firebase/auth';
 import { addDoc, updateDoc, doc, getDoc, getFirestore, query, collection, orderBy, onSnapshot, setDoc } from 'firebase/firestore';
 import { app, Priority, PrioriteUser } from '@/utils/firebase'
@@ -106,7 +106,7 @@ const Home: React.FC = () => {
       </div>
       <h1 className="text-4xl font-bold text-center">Priorite</h1>
       <h2 className="text-3xl font-semibold text-center">Crowdsourced Developmental Priorities List</h2>
-      <p>You have {userData?.credits} credits.</p>
+      {user && <p>You have {userData?.credits} credits.</p>}
       <div>
         <input type='text' value={newPriority} onChange={(e) => setNewPriority(e.target.value)} className='border rounded' />
         <button onClick={addPriority} className='ml-2 bg-blue-500 text-white rounded px-1'>Add Priority</button>
@@ -120,7 +120,9 @@ const Home: React.FC = () => {
             </li>
           ))}
         </ul>
-        <PurchaseCredit username={user?.email}></PurchaseCredit>
+        <Suspense fallback={<div>Loading...</div>}>
+          {user && <PurchaseCredit username={user ? user.email : null}></PurchaseCredit>}
+        </Suspense>
       </div>
 
     </div>
