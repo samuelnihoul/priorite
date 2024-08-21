@@ -6,7 +6,7 @@ import { app, PrioriteUser } from '@/utils/firebase';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
 const environment = process.env.environment;
-const pub_key = environment === 'production' ? process.env.NETX_APP_stripe_pk : process.env.NEXT_APP_stripe_pk_test;
+const pub_key = environment === 'production' ? process.env.NEXT_PUBLIC_stripe_pk : process.env.NEXT_PUBLIC_stripe_pk_test;
 const stripePromise = loadStripe(pub_key);
 
 const PurchaseCredits = ({ username }: { username: string }) => {
